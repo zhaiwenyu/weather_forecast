@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气查询</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 天气动画层 -->
+    <div class="fx-layer" id="fxLayer"></div>
+
+    <div class="app">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="app-title">天气预报</h1>
+            <p class="app-subtitle">实时天气 · 精准预报</p>
+        </header>
+
+        <!-- 搜索 -->
+        <div class="search-wrap">
+            <div class="search-bar" id="searchBar">
+                <svg class="s-icon" viewBox="0 0 24 24" width="20" height="20"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="cityInput" placeholder="搜索城市..." autocomplete="off">
+                <button class="locate-btn" id="locateBtn" title="定位">
+                    <svg viewBox="0 0 24 24" width="19" height="19"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+                </button>
+            </div>
+            <ul class="suggestions" id="suggestions"></ul>
+        </div>
+
+        <!-- 状态消息 -->
+        <div class="msg-toast" id="msgToast">
+            <span class="msg-icon" id="msgIcon"></span>
+            <span class="msg-text" id="msgText"></span>
+        </div>
+
+        <!-- 主要内容区（初始隐藏） -->
+        <div class="content" id="content">
+
+            <!-- 当前天气 -->
+            <div class="card now-card" id="nowCard">
+                <div class="now-top">
+                    <div>
+                        <h2 class="city-name" id="cityName">--</h2>
+                        <p class="weather-desc" id="weatherDesc"></p>
+                    </div>
+                    <span class="time-tag" id="updateTime"></span>
+                </div>
+
+                <div class="now-main">
+                    <img class="now-icon" id="weatherIcon" src="" alt="">
+                    <span class="now-temp" id="temperature">--°</span>
+                </div>
+
+                <div class="now-meta">
+                    <span class="meta-tag" id="feelsLikeTag">体感 --°</span>
+                    <span class="meta-sep">|</span>
+                    <span class="meta-tag" id="hiloTag">--° / --°</span>
+                </div>
+            </div>
+
+            <!-- 详情网格 -->
+            <div class="card detail-grid" id="detailGrid">
+                <div class="d-cell">
+                    <div class="d-icon-bg">💧</div>
+                    <div class="d-info">
+                        <span class="d-val" id="humidity">--%</span>
+                        <span class="d-lbl">湿度</span>
+                    </div>
+                </div>
+                <div class="d-cell">
+                    <div class="d-icon-bg">💨</div>
+                    <div class="d-info">
+                        <span class="d-val" id="windSpeed">--</span>
+                        <span class="d-lbl" id="windDir">风速</span>
+                    </div>
+                </div>
+                <div class="d-cell">
+                    <div class="d-icon-bg">📊</div>
+                    <div class="d-info">
+                        <span class="d-val" id="pressure">--</span>
+                        <span class="d-lbl">气压</span>
+                    </div>
+                </div>
+                <div class="d-cell">
+                    <div class="d-icon-bg">👁</div>
+                    <div class="d-info">
+                        <span class="d-val" id="visibility">--</span>
+                        <span class="d-lbl">能见度</span>
+                    </div>
+                </div>
+                <div class="d-cell">
+                    <div class="d-icon-bg">🌅</div>
+                    <div class="d-info">
+                        <span class="d-val" id="sunrise">--</span>
+                        <span class="d-lbl">日出</span>
+                    </div>
+                </div>
+                <div class="d-cell">
+                    <div class="d-icon-bg">🌇</div>
+                    <div class="d-info">
+                        <span class="d-val" id="sunset">--</span>
+                        <span class="d-lbl">日落</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 空气质量 -->
+            <div class="card aqi-card" id="aqiCard">
+                <div class="sec-header">
+                    <h3>空气质量</h3>
+                    <span class="aqi-badge" id="aqiBadge">--</span>
+                </div>
+                <div class="aqi-grid">
+                    <div class="aqi-item">
+                        <span class="aqi-val" id="aqiPM25">--</span>
+                        <span class="aqi-lbl">PM2.5</span>
+                    </div>
+                    <div class="aqi-item">
+                        <span class="aqi-val" id="aqiPM10">--</span>
+                        <span class="aqi-lbl">PM10</span>
+                    </div>
+                    <div class="aqi-item">
+                        <span class="aqi-val" id="aqiO3">--</span>
+                        <span class="aqi-lbl">O₃</span>
+                    </div>
+                    <div class="aqi-item">
+                        <span class="aqi-val" id="aqiNO2">--</span>
+                        <span class="aqi-lbl">NO₂</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 逐小时预报 -->
+            <div class="card hourly-card" id="hourlyCard">
+                <div class="sec-header"><h3>逐小时预报</h3></div>
+                <div class="hourly-list" id="hourlyList"></div>
+            </div>
+
+            <!-- 每日预报 -->
+            <div class="card daily-card" id="dailyCard">
+                <div class="sec-header"><h3>未来几天</h3></div>
+                <div class="daily-list" id="dailyList"></div>
+            </div>
+
+        </div>
+
+        <!-- 搜索历史 -->
+        <div class="history-wrap" id="historyWrap">
+            <div class="history-top">
+                <span class="hist-title">最近搜索</span>
+                <button class="hist-clear" id="clearHistory">清空</button>
+            </div>
+            <div class="history-tags" id="historyTags"></div>
+        </div>
+
+        <!-- 底部 -->
+        <footer class="footer">
+            <span>数据来源：OpenWeatherMap</span>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
